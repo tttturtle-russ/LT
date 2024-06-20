@@ -55,7 +55,7 @@ class Translator:
                  target,
                  model):
         self.model = model
-        self.path = Path(path) / "lwn"
+        self.path = Path(path)
         self.target = target
         self.prompt = base_prompt
         self.messages = [{"role": "system", "content": self.prompt}]
