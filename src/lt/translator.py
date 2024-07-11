@@ -121,7 +121,7 @@ class Translator:
     @staticmethod
     def __check_error(target):
         # make htmldocs 2 >& 1
-        p = subprocess.run("make htmldocs", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        p = subprocess.run("make htmldocs 2>&1", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if p.returncode != 0:
             raise RuntimeError(f"Error while compiling: {p.stderr}")
         if target in p.stdout:
