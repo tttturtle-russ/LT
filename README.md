@@ -6,6 +6,6 @@ LT(LLM Translator) is autonomous translate agent that helps with Linux Kernel do
 git clone https://github.com/open-atom-hust-club/LT.git
 cd LT
 pdm install
-./translate.sh dev-tools # translate dev-tools directory
+./translate.sh ./lwn dev-tools llama3 # translate dev-tools directory using llama3
 ```
 
