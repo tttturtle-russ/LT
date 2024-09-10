@@ -60,19 +60,19 @@ class Translator:
         self.prompt = base_prompt
         self.messages = [{"role": "system", "content": self.prompt}]
         self.client = OpenAI(
-            base_url="http://localhost:8000/v1",
-            api_key="NA"
+            base_url="https://open.bigmodel.cn/api/paas/v4/",
+            api_key="17d9adc522cdad2d425d70679fd4f4da.8XoYwLukFlVHTV7D"
         )
         self.__init_repo()
         os.chdir(self.path / target)
-        self.output_dir = self.path / "translations/zh_CN" / target
+        self.output_dir = self.path / "../.." / target
         if not self.output_dir.exists():
             self.output_dir.mkdir(exist_ok=True, parents=True)
 
     @staticmethod
     def assistant_message(content):
         return {
-            "role": "assistant",
+            "role": "system",
             "content": content
         }
 
@@ -92,6 +92,7 @@ class Translator:
         if not self.path.exists():
             # if repo not exists, clone it to /tmp/LT
             os.system(f"git clone https://mirrors.hust.edu.cn/git/lwn.git {self.path}")
+
         os.system(f"cd {self.path} && git checkout docs-next")
         self.path = self.path / "Documentation"
         self.target = self.path / self.target
@@ -106,13 +107,16 @@ class Translator:
             f.write(translation)
 
     def translate(self):
+        print(os.getcwd())
         for target in self.target:
             self.messages = [self.assistant_message(self.prompt)]
             original_text = open(target, "r").read()
             self.messages.append(self.user_message(original_text))
             resp = self.client.chat.completions.create(
                 messages=self.messages,
-                model=self.model,
+                model="glm-4",
+                top_p=0.7,
+                temperature=0.9
             )
             translation = resp.choices[0].message.content
             self.messages.append(self.assistant_message(translation))
@@ -128,3 +132,38 @@ class Translator:
             print("Error about translation format")
             return False
         return True
+
+    def test(self):
+        completion = self.client.chat.completions.create(
+        model="glm-4",  
+        messages=[    
+            {"role": "system", "content": "你是一个聪明且富有创造力的小说作家"},    
+            {"role": "user", "content": "请你作为童话故事大王，写一篇短篇童话故事，故事的主题是要永远保持一颗善良的心，要能够激发儿童的学习兴趣和想象力，同时也能够帮助儿童更好地理解和接受故事中所蕴含的道理和价值观。"} 
+        ],
+        top_p=0.7,
+        temperature=0.9
+        )
+        print(completion.choices[0].message)
+
+def main():
+    # from src.lt.translator import Translator
+    from argparse import ArgumentParser
+
+    argparse = ArgumentParser()
+    argparse.add_argument("path")
+    argparse.add_argument("target")
+    argparse.add_argument("model")
+
+    args = argparse.parse_args()
+
+    path = args.path
+    target = args.target
+    model = args.model
+
+    translator = Translator(path=path, target=target, model=model)
+    translator.translate()
+    # translator.translate()
+
+
+if __name__ == "__main__":
+    main() 
