@@ -64,6 +64,7 @@ class Translator:
             api_key="NA"
         )
         self.__init_repo()
+        os.chdir(self.path / target)
         self.output_dir = self.path / "translations/zh_CN" / target
         if not self.output_dir.exists():
             self.output_dir.mkdir(exist_ok=True, parents=True)
@@ -91,7 +92,6 @@ class Translator:
         if not self.path.exists():
             # if repo not exists, clone it to /tmp/LT
             os.system(f"git clone https://mirrors.hust.edu.cn/git/lwn.git {self.path}")
-
         os.system(f"cd {self.path} && git checkout docs-next")
         self.path = self.path / "Documentation"
         self.target = self.path / self.target
